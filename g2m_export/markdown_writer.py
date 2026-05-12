@@ -3,12 +3,12 @@ from typing import List
 from .git_utils import get_file_remote_url
 
 def generate_markdown(root_dir: Path, files: List[Path], remote_url: str, branch: str) -> str:
-    """Generate a single Markdown content from listed files."""
+    """リストされたファイルから単一の Markdown コンテンツを生成する。"""
     lines = []
     repo_name = root_dir.name
     lines.append(f"# 【Repo】 {repo_name}\n")
 
-    # Sort files to ensure consistent output
+    # 出力の一貫性を保つためにファイルをソート
     for file_path in sorted(files):
         rel_path = file_path.relative_to(root_dir)
         depth = len(rel_path.parts)
@@ -16,7 +16,8 @@ def generate_markdown(root_dir: Path, files: List[Path], remote_url: str, branch
 
         lines.append(f"{heading_level} {rel_path}")
 
-        file_remote_url = get_file_remote_url(remote_url, branch, str(rel_path))
+        # URLにはPOSIX形式（スラッシュ）を使用
+        file_remote_url = get_file_remote_url(remote_url, branch, rel_path.as_posix())
         if file_remote_url:
             lines.append(f"Source URL: [View on Remote]({file_remote_url})")
 
@@ -26,12 +27,12 @@ def generate_markdown(root_dir: Path, files: List[Path], remote_url: str, branch
                 content = f.read()
                 lines.append(content)
         except Exception as e:
-            lines.append(f"Error reading file: {e}")
+            lines.append(f"ファイルの読み込みエラー: {e}")
         lines.append("```\n")
 
     return "\n".join(lines)
 
 def write_to_file(output_path: Path, content: str):
-    """Write the generated content to the output file."""
+    """生成されたコンテンツを出力ファイルに書き込む。"""
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(content)
