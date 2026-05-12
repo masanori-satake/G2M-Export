@@ -1,0 +1,4 @@
+ignore_patterns:
+  - ".pytest_cache/*"
+  - "test_output.md"
+  - "【Repo】 *.md"

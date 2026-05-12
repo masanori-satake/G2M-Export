@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+test_output.md
+【Repo】 *.md
+.g2m_export.yaml
