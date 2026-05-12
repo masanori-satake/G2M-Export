@@ -2,10 +2,7 @@ from pathlib import Path
 from typing import List
 from .git_utils import get_file_remote_url
 
-
-def generate_markdown(
-    root_dir: Path, files: List[Path], remote_url: str, branch: str
-) -> str:
+def generate_markdown(root_dir: Path, files: List[Path], remote_url: str, branch: str) -> str:
     """リストされたファイルから単一の Markdown コンテンツを生成する。"""
     lines = []
     repo_name = root_dir.name
@@ -17,7 +14,7 @@ def generate_markdown(
         depth = len(rel_path.parts)
         heading_level = "#" * (depth + 1)
 
-        lines.append(f"{heading_level} {rel_path}")
+        lines.append(f"{heading_level} {rel_path.as_posix()}")
 
         # URLにはPOSIX形式（スラッシュ）を使用
         file_remote_url = get_file_remote_url(remote_url, branch, rel_path.as_posix())
@@ -34,7 +31,6 @@ def generate_markdown(
         lines.append("```\n")
 
     return "\n".join(lines)
-
 
 def write_to_file(output_path: Path, content: str):
     """生成されたコンテンツを出力ファイルに書き込む。"""

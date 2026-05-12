@@ -5,7 +5,6 @@ from .git_utils import get_git_root, get_remote_url, get_current_branch
 from .scanner import scan_files
 from .markdown_writer import generate_markdown, write_to_file
 
-
 def load_config(config_path: Path):
     """設定ファイルを読み込む。"""
     if config_path.exists():
@@ -14,20 +13,10 @@ def load_config(config_path: Path):
             return config if config is not None else {}
     return {}
 
-
 def main():
-    parser = argparse.ArgumentParser(
-        description="G2M-Export: Gitリポジトリを単一のMarkdownファイルにエクスポートします。"
-    )
-    parser.add_argument(
-        "src_dir",
-        nargs="?",
-        default=".",
-        help="スキャン対象のディレクトリ (既定: カレントディレクトリ)",
-    )
-    parser.add_argument(
-        "--config", default=".g2m_export.yaml", help="設定ファイルのパス"
-    )
+    parser = argparse.ArgumentParser(description="G2M-Export: Gitリポジトリを単一のMarkdownファイルにエクスポートします。")
+    parser.add_argument("src_dir", nargs="?", default=".", help="スキャン対象のディレクトリ (既定: カレントディレクトリ)")
+    parser.add_argument("--config", default=".g2m_export.yaml", help="設定ファイルのパス")
     parser.add_argument("--output", help="出力するMarkdownファイルのパス")
 
     args = parser.parse_args()
@@ -63,7 +52,6 @@ def main():
 
     write_to_file(output_path, markdown_content)
     print(f"{output_path} にエクスポートされました。")
-
 
 if __name__ == "__main__":
     main()
