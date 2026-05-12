@@ -8,7 +8,8 @@ from .markdown_writer import generate_markdown, write_to_file
 def load_config(config_path: Path):
     if config_path.exists():
         with open(config_path, "r") as f:
-            return yaml.safe_load(f)
+            config = yaml.safe_load(f)
+            return config if config is not None else {}
     return {}
 
 def main():
@@ -20,7 +21,11 @@ def main():
     args = parser.parse_args()
 
     src_dir = Path(args.src_dir).resolve()
+
+    # Try specified config path, or look for default in src_dir
     config_path = Path(args.config)
+    if not config_path.exists() and args.config == ".g2m_export.yaml":
+        config_path = src_dir / ".g2m_export.yaml"
 
     config = load_config(config_path)
     ignore_patterns = config.get("ignore_patterns", [])
