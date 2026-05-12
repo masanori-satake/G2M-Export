@@ -4,6 +4,7 @@ import tempfile
 import shutil
 from g2m_export.scanner import should_ignore, is_binary
 
+
 class TestScanner(unittest.TestCase):
     def setUp(self):
         self.test_dir = Path(tempfile.mkdtemp())
@@ -45,6 +46,7 @@ class TestScanner(unittest.TestCase):
         with open(bin_file, "wb") as f:
             f.write(b"\x00\x01\x02")
         self.assertTrue(is_binary(bin_file))
+
 
 if __name__ == "__main__":
     unittest.main()
