@@ -108,7 +108,7 @@ flowchart TD
 pip install -r requirements-dev.txt
 
 # テストの実行
-PYTHONPATH=. pytest tests/
+python -m pytest tests/
 ```
 
 ### テスト構成
