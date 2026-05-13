@@ -122,7 +122,7 @@ python -m pytest tests/
 
 ```bash
 pip install pytest-cov
-PYTHONPATH=. pytest --cov=g2m_export tests/
+python -m pytest --cov=g2m_export tests/
 ```
 
 ## コーディング規約
