@@ -1,5 +1,9 @@
 import unittest
-from g2m_export.git_utils import sanitize_remote_url, get_file_remote_url
+from g2m_export.git_utils import (
+    sanitize_remote_url,
+    get_file_remote_url,
+    parse_repo_info,
+)
 
 
 class TestGitUtils(unittest.TestCase):
@@ -36,6 +40,37 @@ class TestGitUtils(unittest.TestCase):
         # Actually I can't easily mock Path object's read in this way without more effort,
         # but I can at least verify the fix for hierarchical branches if I were to test the function.
         pass
+
+    def test_parse_repo_info(self):
+        # GitHub
+        self.assertEqual(
+            parse_repo_info("https://github.com/user/my-repo.git"), (None, "my-repo")
+        )
+        self.assertEqual(
+            parse_repo_info("git@github.com:user/my-repo.git"), (None, "my-repo")
+        )
+
+        # Bitbucket Cloud
+        self.assertEqual(
+            parse_repo_info("https://bitbucket.org/my-workspace/my-repo.git"),
+            ("my-workspace", "my-repo"),
+        )
+        self.assertEqual(
+            parse_repo_info("git@bitbucket.org:my-workspace/my-repo.git"),
+            ("my-workspace", "my-repo"),
+        )
+
+        # Bitbucket Server
+        self.assertEqual(
+            parse_repo_info(
+                "https://bitbucket.example.com/projects/PROJ/repos/my-repo/browse"
+            ),
+            ("PROJ", "my-repo"),
+        )
+        self.assertEqual(
+            parse_repo_info("https://bitbucket.example.com/scm/PROJ/my-repo.git"),
+            ("PROJ", "my-repo"),
+        )
 
 
 if __name__ == "__main__":

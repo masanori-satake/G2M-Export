@@ -80,3 +80,38 @@ def get_file_remote_url(remote_url: str, branch: str, relative_path: str) -> str
     else:
         # デフォルトは GitHub ライクな形式
         return f"{base_url}/blob/{branch}/{relative_path}"
+
+
+def parse_repo_info(url: str):
+    """リモートURLからプロジェクトキーとリポジトリ名を取得する。"""
+    if not url:
+        return None, None
+
+    # 末尾のスラッシュを削除し、.git サフィックスを除去
+    url = url.rstrip("/")
+    if url.endswith(".git"):
+        url = url[:-4]
+
+    # Bitbucket Server (projects/KEY/repos/NAME)
+    match = re.search(r"/projects/([^/]+)/repos/([^/]+)", url)
+    if match:
+        return match.group(1), match.group(2)
+
+    # Bitbucket Server (scm/KEY/NAME)
+    match = re.search(r"/scm/([^/]+)/([^/]+)", url)
+    if match:
+        return match.group(1), match.group(2)
+
+    # Bitbucket Cloud (bitbucket.org/WORKSPACE/REPO)
+    if "bitbucket.org" in url:
+        # プロトコルとホストを除去
+        path = re.sub(r"^.*bitbucket\.org[:/]", "", url)
+        parts = path.strip("/").split("/")
+        if len(parts) >= 2:
+            return parts[0], parts[1]
+
+    # GitHub or others: 最後のスラッシュ以降をリポジトリ名とする
+    # git@github.com:user/repo -> repo
+    # https://github.com/user/repo -> repo
+    repo_name = url.split("/")[-1].split(":")[-1]
+    return None, repo_name

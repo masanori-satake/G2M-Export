@@ -47,7 +47,13 @@ python -m g2m_export.cli
 python -m g2m_export.cli /path/to/your/repo
 ```
 
-出力先を指定して実行:
+出力先ディレクトリを指定して実行（既定値: `output`）:
+
+```bash
+python -m g2m_export.cli . --output-dir my_output
+```
+
+出力ファイル名を指定して実行:
 
 ```bash
 python -m g2m_export.cli . --output my_repo.md
@@ -57,7 +63,14 @@ python -m g2m_export.cli . --output my_repo.md
 
 - `src_dir`: スキャン対象のディレクトリ (既定: カレントディレクトリ)
 - `--config`: 設定ファイルのパス (既定: `.g2m_export.yaml`)
-- `--output`: 出力する Markdown ファイルのパス (既定: `【Repo】 <ディレクトリ名>.md`)
+- `--output`: 出力する Markdown ファイル名またはパス
+- `--output-dir`: 出力先のディレクトリ (既定: `output`)
+
+## デフォルトの出力ファイル名
+
+- Git リポジトリの場合: `【Repo】 <リポジトリ名>.md`
+  - Bitbucket 等でプロジェクトキーが取得可能な場合: `【Repo】 <プロジェクトキー>_<リポジトリ名>.md`
+- それ以外の場合: `【Dir】 <ディレクトリ名>.md`
 
 ## 開発者向け
 
