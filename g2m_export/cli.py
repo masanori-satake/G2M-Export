@@ -11,10 +11,13 @@ from .scanner import scan_files
 from .markdown_writer import generate_markdown, write_to_file
 
 
-def load_config(config_path: Path):
-    """設定ファイルを読み込む。"""
+def load_config(config_path: Path) -> dict:
+    """指定されたパスからYAML形式の設定ファイルを読み込む。
+
+    ファイルが存在しない、または内容が空の場合は空の辞書を返す。
+    """
     if config_path.exists():
-        with open(config_path, "r") as f:
+        with open(config_path, "r", encoding="utf-8") as f:
             config = yaml.safe_load(f)
             return config if config is not None else {}
     return {}
@@ -40,8 +43,8 @@ def main():
 
     src_dir = Path(args.src_dir).resolve()
 
-    # 指定された設定パスを試すか、src_dir 内の既定ファイルを探す
     config_path = Path(args.config)
+    # 明示的に指定されていない場合、スキャン対象ディレクトリ直下の設定ファイルを優先的に探す
     if not config_path.exists() and args.config == ".g2m_export.yaml":
         config_path = src_dir / ".g2m_export.yaml"
 
@@ -50,9 +53,9 @@ def main():
     binary_extensions = config.get("binary_extensions", [])
     output_dir_config = config.get("output_dir", "output")
 
-    # 出力ディレクトリの決定
     output_dir = Path(args.output_dir or output_dir_config)
     if not output_dir.is_absolute():
+        # 出力ディレクトリが相対パスで指定された場合、カレントディレクトリを基準に解決する
         output_dir = Path.cwd() / output_dir
 
     git_root = get_git_root(src_dir)
@@ -71,10 +74,9 @@ def main():
     if args.output:
         output_path = Path(args.output)
         if not output_path.is_absolute():
-            # 相対パスの場合は output_dir を基準とする
             output_path = output_dir / output_path
     else:
-        # デフォルトファイル名の決定
+        # 出力先が指定されていない場合、Gitリポジトリ名やディレクトリ名に基づいたファイル名を自動生成する
         if git_root:
             proj_key, repo_name = parse_repo_info(remote_url)
             if not repo_name:
@@ -89,7 +91,6 @@ def main():
 
         output_path = output_dir / filename
 
-    # 出力ディレクトリの作成
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     write_to_file(output_path, markdown_content)
