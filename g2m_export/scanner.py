@@ -4,13 +4,15 @@ from typing import List, Iterator
 
 
 def is_binary(file_path: Path) -> bool:
-    """ヌルバイトの有無またはデコード失敗により、ファイルがバイナリかどうかを判定する。"""
+    """ファイルの内容を確認し、テキストファイルかバイナリファイルかを判定する。
+
+    先頭1024バイトにヌルバイトが含まれているか、UTF-8としてデコードできない場合はバイナリとみなす。
+    """
     try:
         with open(file_path, "rb") as f:
             chunk = f.read(1024)
             if b"\x00" in chunk:
                 return True
-            # utf-8 としてデコードを試みる
             chunk.decode("utf-8")
             return False
     except UnicodeDecodeError:
@@ -20,18 +22,19 @@ def is_binary(file_path: Path) -> bool:
 
 
 def should_ignore(path: Path, root: Path, ignore_patterns: List[str]) -> bool:
-    """パターンに基づき、パスを除外すべきかどうかを判定する。"""
+    """設定された除外パターンに基づき、対象パスを処理から外すべきか判定する。"""
     rel_path_obj = path.relative_to(root)
     rel_path = str(rel_path_obj)
 
-    # .git ディレクトリは常に除外
+    # Gitの内部管理ディレクトリは常に除外対象とする
     if ".git" in rel_path_obj.parts:
         return True
 
     for pattern in ignore_patterns:
+        # ファイル名単体、またはルートからの相対パスでパターンマッチングを行う
         if fnmatch.fnmatch(rel_path, pattern) or fnmatch.fnmatch(path.name, pattern):
             return True
-        # "node_modules/*" のようなディレクトリ固有のパターンをサポート
+        # ディレクトリ構造のいずれかのパーツがパターンに合致する場合も除外（例: node_modules）
         if any(
             fnmatch.fnmatch(part, pattern.rstrip("/")) for part in rel_path_obj.parts
         ):
@@ -43,7 +46,7 @@ def should_ignore(path: Path, root: Path, ignore_patterns: List[str]) -> bool:
 def scan_files(
     root_dir: Path, ignore_patterns: List[str], binary_extensions: List[str] = None
 ) -> Iterator[Path]:
-    """root_dir 内のファイルを再帰的にスキャンし、除外パターンとバイナリチェックでフィルタリングする。"""
+    """指定されたディレクトリを再帰的に走査し、有効なテキストファイルのみを列挙する。"""
     if binary_extensions is None:
         binary_extensions = []
 

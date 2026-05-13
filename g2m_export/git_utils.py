@@ -3,7 +3,7 @@ from pathlib import Path
 
 
 def get_git_root(start_path: Path) -> Path:
-    """開始パスから親ディレクトリへ遡り、.gitディレクトリを探す。"""
+    """指定されたパスから親ディレクトリに向かって探索し、Gitリポジトリのルート（.gitが存在する場所）を特定する。"""
     curr = start_path.resolve()
     while curr != curr.parent:
         if (curr / ".git").is_dir():
@@ -13,15 +13,15 @@ def get_git_root(start_path: Path) -> Path:
 
 
 def get_remote_url(git_root: Path) -> str:
-    """.git/config を読み取り、origin リモートのURLを取得する。"""
+    """gitコマンドを使用せずに .git/config から直接 origin リモートのURLを取得する。"""
     config_path = git_root / ".git" / "config"
     if not config_path.exists():
         return None
 
-    with open(config_path, "r") as f:
+    with open(config_path, "r", encoding="utf-8", errors="ignore") as f:
         content = f.read()
 
-    # [remote "origin"] の url を抽出する正規表現（引用符の有無に対応）
+    # セクション [remote "origin"] 内の url 属性を探す
     match = re.search(
         r'\[remote\s+"?origin"?\][^\[]*url\s*=\s*(\S+)', content, re.MULTILINE
     )
@@ -32,22 +32,22 @@ def get_remote_url(git_root: Path) -> str:
 
 
 def get_current_branch(git_root: Path) -> str:
-    """.git/HEAD を読み取り、現在のブランチ名を取得する。"""
+    """gitコマンドを使用せずに .git/HEAD から現在のブランチ名を取得する。"""
     head_path = git_root / ".git" / "HEAD"
     if not head_path.exists():
         return None
 
-    with open(head_path, "r") as f:
+    with open(head_path, "r", encoding="utf-8", errors="ignore") as f:
         content = f.read().strip()
 
     if content.startswith("ref: "):
-        # refs/heads/ 以降を抽出
+        # 'ref: refs/heads/master' 形式からブランチ名のみを取り出す
         ref_prefix = "refs/heads/"
         if ref_prefix in content:
             return content[content.find(ref_prefix) + len(ref_prefix) :].strip()
-        # refs/heads/ が含まれない場合は ref: 以降をそのまま返す
         return content[len("ref: ") :].strip()
-    return content  # ハッシュ値の場合がある
+    # デタッチドHEAD状態などの場合はコミットハッシュが直接書かれている
+    return content
 
 
 def sanitize_remote_url(url: str) -> str:
@@ -66,24 +66,24 @@ def sanitize_remote_url(url: str) -> str:
 
 
 def get_file_remote_url(remote_url: str, branch: str, relative_path: str) -> str:
-    """リモートリポジトリ上のファイルのURLを生成する。"""
+    """リモートリポジトリ（GitHub/Bitbucket等）のWebビューでファイルを表示するためのURLを構築する。"""
     if not remote_url or not branch:
         return ""
 
     base_url = sanitize_remote_url(remote_url)
 
-    # GitHub, GitLab, Bitbucket のサポート
+    # プロバイダーごとのパス形式の違いを吸収する
     if "github.com" in base_url or "gitlab.com" in base_url:
         return f"{base_url}/blob/{branch}/{relative_path}"
     elif "bitbucket.org" in base_url:
         return f"{base_url}/src/{branch}/{relative_path}"
     else:
-        # デフォルトは GitHub ライクな形式
+        # 未知のプロバイダーについては、GitHubに多い blob 形式をデフォルトとする
         return f"{base_url}/blob/{branch}/{relative_path}"
 
 
 def parse_repo_info(url: str):
-    """リモートURLからプロジェクトキーとリポジトリ名を取得する。"""
+    """リモートURLから、命名に使用するプロジェクト名（キー）とリポジトリ名を抽出する。"""
     if not url:
         return None, None
 
