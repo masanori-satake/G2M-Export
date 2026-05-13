@@ -84,12 +84,8 @@ def main():
     if args.output:
         output_path = Path(args.output)
         if not output_path.is_absolute():
-            # ファイル名のみ指定された場合は output_dir を使う
-            if len(output_path.parts) == 1:
-                output_path = output_dir / output_path
-            else:
-                # パスが含まれる場合はカレントディレクトリからの相対パス（または絶対パス）
-                output_path = output_path.resolve()
+            # 相対パスの場合は output_dir を基準とする
+            output_path = output_dir / output_path
     else:
         output_path = output_dir / filename
 
