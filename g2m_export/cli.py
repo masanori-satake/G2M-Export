@@ -46,9 +46,9 @@ def main():
         config_path = src_dir / ".g2m_export.yaml"
 
     config = load_config(config_path)
-    ignore_patterns = config.get("ignore_patterns") or []
-    binary_extensions = config.get("binary_extensions") or []
-    output_dir_config = config.get("output_dir") or "output"
+    ignore_patterns = config.get("ignore_patterns", [])
+    binary_extensions = config.get("binary_extensions", [])
+    output_dir_config = config.get("output_dir", "output")
 
     # 出力ディレクトリの決定
     output_dir = Path(args.output_dir or output_dir_config)
@@ -68,25 +68,25 @@ def main():
 
     markdown_content = generate_markdown(src_dir, files, remote_url, branch)
 
-    # デフォルトファイル名の決定
-    if git_root:
-        proj_key, repo_name = parse_repo_info(remote_url)
-        if not repo_name:
-            repo_name = git_root.name
-
-        if proj_key:
-            filename = f"【Repo】 {proj_key}_{repo_name}.md"
-        else:
-            filename = f"【Repo】 {repo_name}.md"
-    else:
-        filename = f"【Dir】 {src_dir.name}.md"
-
     if args.output:
         output_path = Path(args.output)
         if not output_path.is_absolute():
             # 相対パスの場合は output_dir を基準とする
             output_path = output_dir / output_path
     else:
+        # デフォルトファイル名の決定
+        if git_root:
+            proj_key, repo_name = parse_repo_info(remote_url)
+            if not repo_name:
+                repo_name = git_root.name
+
+            if proj_key:
+                filename = f"【Repo】 {proj_key}_{repo_name}.md"
+            else:
+                filename = f"【Repo】 {repo_name}.md"
+        else:
+            filename = f"【Dir】 {src_dir.name}.md"
+
         output_path = output_dir / filename
 
     # 出力ディレクトリの作成
