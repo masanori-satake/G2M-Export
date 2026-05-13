@@ -87,7 +87,8 @@ def parse_repo_info(url: str):
     if not url:
         return None, None
 
-    # .git サフィックスを除去
+    # 末尾のスラッシュを削除し、.git サフィックスを除去
+    url = url.rstrip("/")
     if url.endswith(".git"):
         url = url[:-4]
 
