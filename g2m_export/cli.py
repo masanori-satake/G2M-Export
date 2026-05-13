@@ -46,9 +46,9 @@ def main():
         config_path = src_dir / ".g2m_export.yaml"
 
     config = load_config(config_path)
-    ignore_patterns = config.get("ignore_patterns", [])
-    binary_extensions = config.get("binary_extensions", [])
-    output_dir_config = config.get("output_dir", "output")
+    ignore_patterns = config.get("ignore_patterns") or []
+    binary_extensions = config.get("binary_extensions") or []
+    output_dir_config = config.get("output_dir") or "output"
 
     # 出力ディレクトリの決定
     output_dir = Path(args.output_dir or output_dir_config)
