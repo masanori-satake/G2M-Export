@@ -26,7 +26,7 @@ graph TD
 classDiagram
     class CLI {
         +main() CLIの起点。引数解析と全体制御
-        +load_config() .g2m_export.yamlの読み込み
+        +load_config() g2m_config.yamlの読み込み
     }
     class Scanner {
         +scan_files() ファイルの再帰的走査
@@ -58,7 +58,7 @@ CLI を実行してから Markdown ファイルが出力されるまでの流れ
 sequenceDiagram
     actor User
     User->>CLI: コマンド実行 (src_dir, options)
-    CLI->>CLI: 設定の読み込み (.g2m_export.yaml)
+    CLI->>CLI: 設定の読み込み (g2m_config.yaml)
     CLI->>GitUtils: Gitルート、リモートURL、ブランチの取得
     GitUtils-->>CLI: Git情報
     CLI->>Scanner: ファイルスキャン (ignore_patterns, binary_extensions)
