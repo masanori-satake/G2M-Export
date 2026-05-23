@@ -45,8 +45,10 @@ def main():
 
     config_path = Path(args.config)
     # 明示的に指定されていない場合、スキャン対象ディレクトリ直下の設定ファイルを優先的に探す
-    if not config_path.exists() and args.config == "g2m_config.yaml":
-        config_path = src_dir / "g2m_config.yaml"
+    if args.config == "g2m_config.yaml":
+        src_config = src_dir / "g2m_config.yaml"
+        if src_config.exists():
+            config_path = src_config
 
     config = load_config(config_path)
     ignore_patterns = config.get("ignore_patterns", [])
