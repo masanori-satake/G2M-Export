@@ -34,7 +34,7 @@ def main():
         help="スキャン対象のディレクトリ (既定: カレントディレクトリ)",
     )
     parser.add_argument(
-        "--config", default=".g2m_export.yaml", help="設定ファイルのパス"
+        "--config", default="g2m_config.yaml", help="設定ファイルのパス"
     )
     parser.add_argument("--output", help="出力するMarkdownファイルのパス")
     parser.add_argument("--output-dir", help="出力先のディレクトリ")
@@ -45,8 +45,8 @@ def main():
 
     config_path = Path(args.config)
     # 明示的に指定されていない場合、スキャン対象ディレクトリ直下の設定ファイルを優先的に探す
-    if not config_path.exists() and args.config == ".g2m_export.yaml":
-        config_path = src_dir / ".g2m_export.yaml"
+    if not config_path.exists() and args.config == "g2m_config.yaml":
+        config_path = src_dir / "g2m_config.yaml"
 
     config = load_config(config_path)
     ignore_patterns = config.get("ignore_patterns", [])

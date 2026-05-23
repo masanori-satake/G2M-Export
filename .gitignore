@@ -5,4 +5,4 @@ __pycache__/
 .pytest_cache/
 test_output.md
 【Repo】 *.md
-.g2m_export.yaml
+g2m_config.yaml

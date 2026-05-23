@@ -7,7 +7,7 @@
 - ローカル Git リポジトリを再帰的にスキャンし、1つの Markdown ファイルに統合
 - `.git` ディレクトリから「リモートURL」と「カレントブランチ名」を直接取得（`git` コマンド不要）
 - 各ファイルのセクションに [View on Remote](URL) 形式のリンクを挿入
-- 設定ファイル (`.g2m_export.yaml`) による柔軟な除外設定 (`ignore_patterns`)
+- 設定ファイル (`g2m_config.yaml`) による柔軟な除外設定 (`ignore_patterns`)
 - ディレクトリ深さに応じた見出しレベル (`#`, `##`, ...) の動的変更
 - バイナリファイルの自動判定と除外
 
@@ -24,7 +24,8 @@ pip install -r requirements.txt
 
 ### 1. 設定ファイルの準備（任意）
 
-プロジェクトルートまたはスキャン対象ディレクトリに `.g2m_export.yaml` を作成し、除外パターンを指定できます。
+必要に応じて、プロジェクトルートまたはスキャン対象ディレクトリに `g2m_config.yaml` を用意し、除外パターンを指定できます。
+リポジトリにある `g2m_config_sample.yaml` を `g2m_config.yaml` にコピーして、必要であれば除外対象を追加/修正してください。
 
 ```yaml
 ignore_patterns:
@@ -62,7 +63,7 @@ python -m g2m_export.cli . --output my_repo.md
 ## パラメータ
 
 - `src_dir`: スキャン対象のディレクトリ (既定: カレントディレクトリ)
-- `--config`: 設定ファイルのパス (既定: `.g2m_export.yaml`)
+- `--config`: 設定ファイルのパス (既定: `g2m_config.yaml`)
 - `--output`: 出力する Markdown ファイル名またはパス
 - `--output-dir`: 出力先のディレクトリ (既定: `output`)
 
