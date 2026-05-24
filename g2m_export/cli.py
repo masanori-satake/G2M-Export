@@ -103,12 +103,6 @@ def main():
         remote_url = get_remote_url(git_root)
         branch = get_current_branch(git_root)
 
-    print(f"{src_dir} をスキャン中...")
-    files = list(scan_files(src_dir, ignore_patterns, binary_extensions))
-    print(f"{len(files)} 個のファイルが見つかりました。")
-
-    markdown_content = generate_markdown(src_dir, files, remote_url, branch)
-
     if args.output:
         output_path = Path(args.output)
         if not output_path.is_absolute():
@@ -141,8 +135,30 @@ def main():
         )
         sys.exit(1)
 
+    # 書き込み可能か事前にチェックする
     try:
         output_path.parent.mkdir(parents=True, exist_ok=True)
+        if output_path.exists():
+            # 既存ファイルが書き込み可能かチェック
+            with open(output_path, "r+", encoding="utf-8") as f:
+                pass
+        else:
+            # 新規ファイルが作成可能かチェック
+            with open(output_path, "a", encoding="utf-8") as f:
+                pass
+    except OSError as e:
+        print(
+            f"出力ファイルへのアクセス権限がないか、ファイルがロックされています（現象）。出力先の権限や他プログラムでの利用状況を確認してください（対処方法）。詳細: {e}（原因）"
+        )
+        sys.exit(1)
+
+    print(f"{src_dir} をスキャン中...")
+    files = list(scan_files(src_dir, ignore_patterns, binary_extensions))
+    print(f"{len(files)} 個のファイルが見つかりました。")
+
+    markdown_content = generate_markdown(src_dir, files, remote_url, branch)
+
+    try:
         write_to_file(output_path, markdown_content)
         print(f"{output_path} にエクスポートされました。")
     except OSError as e:
