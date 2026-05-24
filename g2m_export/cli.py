@@ -67,10 +67,6 @@ def main():
 
     args = parser.parse_args()
 
-    # 実行時点のタイムスタンプを取得 (Suffix用)
-    now = datetime.now()
-    suffix = now.strftime("_%y%m%d_%H%M%S")
-
     src_dir = Path(args.src_dir).resolve()
 
     config_path = Path(args.config)
@@ -122,6 +118,9 @@ def main():
             base_name = f"【Dir】 {src_dir.name}"
 
         if not overwrite:
+            # 実行時点のタイムスタンプを取得 (Suffix用)
+            now = datetime.now()
+            suffix = now.strftime("_%y%m%d_%H%M%S")
             filename = f"{base_name}{suffix}.md"
         else:
             filename = f"{base_name}.md"
@@ -140,11 +139,11 @@ def main():
         output_path.parent.mkdir(parents=True, exist_ok=True)
         if output_path.exists():
             # 既存ファイルが書き込み可能かチェック
-            with open(output_path, "r+", encoding="utf-8") as f:
+            with open(output_path, "r+", encoding="utf-8"):
                 pass
         else:
             # 新規ファイルが作成可能かチェック
-            with open(output_path, "a", encoding="utf-8") as f:
+            with open(output_path, "a", encoding="utf-8"):
                 pass
     except OSError as e:
         print(
