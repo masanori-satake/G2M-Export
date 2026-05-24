@@ -1,5 +1,7 @@
 import argparse
+import sys
 import yaml
+from datetime import datetime
 from pathlib import Path
 from .git_utils import (
     get_git_root,
@@ -50,8 +52,24 @@ def main():
     )
     parser.add_argument("--output", help="出力するMarkdownファイルのパス")
     parser.add_argument("--output-dir", help="出力先のディレクトリ")
+    parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        default=None,
+        help="既存の出力ファイルを上書きする",
+    )
+    parser.add_argument(
+        "--no-overwrite",
+        action="store_false",
+        dest="overwrite",
+        help="既存の出力ファイルを上書きしない (既定)",
+    )
 
     args = parser.parse_args()
+
+    # 実行時点のタイムスタンプを取得 (Suffix用)
+    now = datetime.now()
+    suffix = now.strftime("_%y%m%d_%H%M%S")
 
     src_dir = Path(args.src_dir).resolve()
 
@@ -66,6 +84,12 @@ def main():
     ignore_patterns = config.get("ignore_patterns", [])
     binary_extensions = config.get("binary_extensions", [])
     output_dir_config = config.get("output_dir", "output")
+    overwrite_config = config.get("overwrite", False)
+
+    # 上書き設定の優先順位: コマンドライン引数 > 設定ファイル > デフォルト(False)
+    overwrite = overwrite_config
+    if args.overwrite is not None:
+        overwrite = args.overwrite
 
     output_dir = Path(args.output_dir or output_dir_config)
     if not output_dir.is_absolute():
@@ -97,13 +121,25 @@ def main():
                 repo_name = git_root.name
 
             if proj_key:
-                filename = f"【Repo】 {proj_key}_{repo_name}.md"
+                base_name = f"【Repo】 {proj_key}_{repo_name}"
             else:
-                filename = f"【Repo】 {repo_name}.md"
+                base_name = f"【Repo】 {repo_name}"
         else:
-            filename = f"【Dir】 {src_dir.name}.md"
+            base_name = f"【Dir】 {src_dir.name}"
+
+        if not overwrite:
+            filename = f"{base_name}{suffix}.md"
+        else:
+            filename = f"{base_name}.md"
 
         output_path = output_dir / filename
+
+    # 上書き不許可時にファイルが既に存在する場合、エラーとする
+    if not overwrite and output_path.exists():
+        print(
+            f"出力ファイルが既に存在します（現象）。既存のファイルを移動するか、--overwrite オプションを指定してください（対処方法）。詳細: {output_path} が既に存在します（原因）"
+        )
+        sys.exit(1)
 
     try:
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -113,6 +149,7 @@ def main():
         print(
             f"ファイルの書き出しに失敗しました（現象）。出力先ディレクトリの権限やディスク容量を確認してください（対処方法）。詳細: {e}（原因）"
         )
+        sys.exit(1)
 
 
 if __name__ == "__main__":

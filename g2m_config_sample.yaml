@@ -1,3 +1,6 @@
+# 既存の出力ファイルを上書きするかどうか (true/false)
+overwrite: false
+
 ignore_patterns:
   - ".pytest_cache/*"
   - "test_output.md"
