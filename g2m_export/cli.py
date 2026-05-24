@@ -22,9 +22,14 @@ def load_config(config_path: Path) -> dict:
             with open(config_path, "r", encoding="utf-8") as f:
                 config = yaml.safe_load(f)
                 return config if config is not None else {}
-        except Exception as e:
+        except yaml.YAMLError as e:
             print(
-                f"設定ファイルの読み込みに失敗しました（現象）。{config_path} の内容が正しいYAML形式か確認してください（対処方法）。詳細: {e}（原因）"
+                f"設定ファイルの解析に失敗しました（現象）。{config_path} の内容が正しいYAML形式か確認してください（対処方法）。詳細: {e}（原因）"
+            )
+            return {}
+        except OSError as e:
+            print(
+                f"設定ファイルの読み込みに失敗しました（現象）。{config_path} のアクセス権限などを確認してください（対処方法）。詳細: {e}（原因）"
             )
             return {}
     return {}
@@ -104,7 +109,7 @@ def main():
         output_path.parent.mkdir(parents=True, exist_ok=True)
         write_to_file(output_path, markdown_content)
         print(f"{output_path} にエクスポートされました。")
-    except Exception as e:
+    except OSError as e:
         print(
             f"ファイルの書き出しに失敗しました（現象）。出力先ディレクトリの権限やディスク容量を確認してください（対処方法）。詳細: {e}（原因）"
         )
