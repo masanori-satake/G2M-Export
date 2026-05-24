@@ -31,8 +31,10 @@ def generate_markdown(
             with open(file_path, "r", encoding="utf-8") as f:
                 content = f.read()
                 lines.append(content)
-        except Exception as e:
-            lines.append(f"ファイルの読み込みエラー: {e}")
+        except OSError as e:
+            lines.append(
+                f"ファイルの読み込みに失敗しました（現象）。ファイルが途中で削除されたか、権限がない可能性があります（対処方法）。詳細: {e}（原因）"
+            )
         lines.append("```\n")
 
     return "\n".join(lines)
