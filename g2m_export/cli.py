@@ -192,8 +192,10 @@ def main():
 
         # 書き込み可能か事前にチェックする (J2Mの仕様に合わせて各分割ファイルでもチェック)
         if not overwrite and out_path.exists():
-             print(f"出力ファイルが既に存在します（現象）。既存のファイルを移動するか、--overwrite オプションを指定してください（対処方法）。詳細: {out_path} が既に存在します（原因）")
-             sys.exit(1)
+            print(
+                f"出力ファイルが既に存在します（現象）。既存のファイルを移動するか、--overwrite オプションを指定してください（対処方法）。詳細: {out_path} が既に存在します（原因）"
+            )
+            sys.exit(1)
 
         try:
             if out_path.exists():
@@ -203,16 +205,22 @@ def main():
                 with open(out_path, "a", encoding="utf-8"):
                     pass
         except OSError as e:
-            print(f"出力ファイルへのアクセス権限がないか、ファイルがロックされています（現象）。出力先の権限や他プログラムでの利用状況を確認してください（対処方法）。詳細: {e}（原因）")
+            print(
+                f"出力ファイルへのアクセス権限がないか、ファイルがロックされています（現象）。出力先の権限や他プログラムでの利用状況を確認してください（対処方法）。詳細: {e}（原因）"
+            )
             sys.exit(1)
 
         try:
             write_to_file(out_path, content_str)
             written_size = len(content_str.encode("utf-8"))
             total_bytes_written += written_size
-            print(f"{out_path} にエクスポートされました。 ({written_size / (1024*1024):.2f} MB)")
+            print(
+                f"{out_path} にエクスポートされました。 ({written_size / (1024 * 1024):.2f} MB)"
+            )
         except OSError as e:
-            print(f"ファイルの書き出しに失敗しました（現象）。出力先ディレクトリの権限やディスク容量を確認してください（対処方法）。詳細: {e}（原因）")
+            print(
+                f"ファイルの書き出しに失敗しました（現象）。出力先ディレクトリの権限やディスク容量を確認してください（対処方法）。詳細: {e}（原因）"
+            )
             sys.exit(1)
 
     current_content.append(header)
@@ -223,12 +231,20 @@ def main():
         section_bytes = len(section.encode("utf-8"))
 
         # 全体制限のチェック
-        if total_bytes_written + current_content_bytes + section_bytes > stop_threshold_bytes:
-            print(f"全体サイズ制限 ({stop_threshold_mb} MB) を超えるため、スキャンを中断します。")
+        if (
+            total_bytes_written + current_content_bytes + section_bytes
+            > stop_threshold_bytes
+        ):
+            print(
+                f"全体サイズ制限 ({stop_threshold_mb} MB) を超えるため、スキャンを中断します。"
+            )
             break
 
         # 1ファイル制限のチェック
-        if current_content_bytes + section_bytes > max_bytes and len(current_content) > 1:
+        if (
+            current_content_bytes + section_bytes > max_bytes
+            and len(current_content) > 1
+        ):
             # 現在の内容を書き出し、新しいファイルを開始
             flush_content(current_content, file_index)
             file_index += 1
