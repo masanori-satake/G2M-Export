@@ -6,18 +6,20 @@ from g2m_export.cli import main
 import sys
 from unittest.mock import patch
 
+
 @pytest.fixture
 def temp_dir():
     d = tempfile.mkdtemp()
     yield Path(d)
     shutil.rmtree(d)
 
+
 def test_cli_splitting(temp_dir, capsys):
     src = temp_dir / "src"
     src.mkdir()
     # Create multiple files to trigger splitting
     # Each file will be around 0.5MB, and we set max-mb to 0.1 to force split
-    content = "A" * (1024 * 512) # 0.5MB
+    content = "A" * (1024 * 512)  # 0.5MB
     (src / "file1.txt").write_text(content)
     (src / "file2.txt").write_text(content)
 
@@ -27,12 +29,14 @@ def test_cli_splitting(temp_dir, capsys):
     test_args = [
         "g2m_export.cli",
         str(src),
-        "--output-dir", str(output_dir),
-        "--max-mb", "0.1",
-        "--overwrite"
+        "--output-dir",
+        str(output_dir),
+        "--max-mb",
+        "0.1",
+        "--overwrite",
     ]
 
-    with patch.object(sys, 'argv', test_args):
+    with patch.object(sys, "argv", test_args):
         main()
 
     # Check if two files are created
@@ -43,10 +47,11 @@ def test_cli_splitting(temp_dir, capsys):
     assert "【Dir】 src_2.md" in filenames
     assert len(out_files) == 2
 
+
 def test_cli_stop_threshold(temp_dir, capsys):
     src = temp_dir / "src"
     src.mkdir()
-    content = "A" * (1024 * 512) # 0.5MB
+    content = "A" * (1024 * 512)  # 0.5MB
     (src / "file1.txt").write_text(content)
     (src / "file2.txt").write_text(content)
     (src / "file3.txt").write_text(content)
@@ -59,12 +64,14 @@ def test_cli_stop_threshold(temp_dir, capsys):
     test_args = [
         "g2m_export.cli",
         str(src),
-        "--output-dir", str(output_dir),
-        "--stop-threshold-mb", "0.7",
-        "--overwrite"
+        "--output-dir",
+        str(output_dir),
+        "--stop-threshold-mb",
+        "0.7",
+        "--overwrite",
     ]
 
-    with patch.object(sys, 'argv', test_args):
+    with patch.object(sys, "argv", test_args):
         main()
 
     out_files = list(output_dir.glob("*.md"))
@@ -72,7 +79,10 @@ def test_cli_stop_threshold(temp_dir, capsys):
     assert len(out_files) == 1
 
     captured = capsys.readouterr()
-    assert "全体サイズ制限 (0.7 MB) を超えるため、スキャンを中断します。" in captured.out
+    assert (
+        "全体サイズ制限 (0.7 MB) を超えるため、スキャンを中断します。" in captured.out
+    )
+
 
 def test_cli_overwrite_with_suffix(temp_dir):
     src = temp_dir / "src"
@@ -89,11 +99,12 @@ def test_cli_overwrite_with_suffix(temp_dir):
     test_args = [
         "g2m_export.cli",
         str(src),
-        "--output-dir", str(output_dir),
-        "--no-overwrite"
+        "--output-dir",
+        str(output_dir),
+        "--no-overwrite",
     ]
 
-    with patch.object(sys, 'argv', test_args):
+    with patch.object(sys, "argv", test_args):
         main()
 
     out_files = list(output_dir.glob("*.md"))
@@ -101,6 +112,7 @@ def test_cli_overwrite_with_suffix(temp_dir):
     assert len(out_files) == 2
     filenames = [f.name for f in out_files]
     assert any("_" in f for f in filenames if f != "【Dir】 src.md")
+
 
 def test_cli_overwrite_enabled(temp_dir):
     src = temp_dir / "src"
@@ -117,11 +129,12 @@ def test_cli_overwrite_enabled(temp_dir):
     test_args = [
         "g2m_export.cli",
         str(src),
-        "--output-dir", str(output_dir),
-        "--overwrite"
+        "--output-dir",
+        str(output_dir),
+        "--overwrite",
     ]
 
-    with patch.object(sys, 'argv', test_args):
+    with patch.object(sys, "argv", test_args):
         main()
 
     out_files = list(output_dir.glob("*.md"))
