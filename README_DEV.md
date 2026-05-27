@@ -27,6 +27,7 @@ classDiagram
     class CLI {
         +main() CLIの起点。引数解析と全体制御
         +load_config() g2m_config.yamlの読み込み
+        +flush_content() Markdownのファイル書き出し（分割対応）
     }
     class Scanner {
         +scan_files() ファイルの再帰的走査
@@ -41,7 +42,9 @@ classDiagram
         +parse_repo_info() リポジトリ名やプロジェクトキーの解析
     }
     class MarkdownWriter {
-        +generate_markdown() Markdownコンテンツの構築
+        +generate_header() ヘッダーの生成
+        +generate_file_section() ファイルごとのセクション生成
+        +generate_markdown() Markdownコンテンツの構築（一括生成用）
         +write_to_file() ファイルへの保存
     }
     CLI ..> Scanner
