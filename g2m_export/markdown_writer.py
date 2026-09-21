@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List
+
 from .git_utils import get_file_remote_url
 
 
@@ -41,7 +41,7 @@ def generate_file_section(
 
 
 def generate_markdown(
-    root_dir: Path, files: List[Path], remote_url: str, branch: str
+    root_dir: Path, files: list[Path], remote_url: str, branch: str
 ) -> str:
     """スキャンされたファイル群の内容を統合し、単一の Markdown 文字列を生成する。"""
     sections = []

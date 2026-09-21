@@ -1,8 +1,9 @@
 import unittest
+
 from g2m_export.git_utils import (
-    sanitize_remote_url,
     get_file_remote_url,
     parse_repo_info,
+    sanitize_remote_url,
 )
 
 
