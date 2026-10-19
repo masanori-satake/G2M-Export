@@ -59,8 +59,7 @@ def sanitize_remote_url(url: str) -> str:
     if url.startswith("git@"):
         url = url.replace(":", "/").replace("git@", "https://")
 
-    if url.endswith(".git"):
-        url = url[:-4]
+    url = url.removesuffix(".git")
 
     return url
 
@@ -89,8 +88,7 @@ def parse_repo_info(url: str):
 
     # 末尾のスラッシュを削除し、.git サフィックスを除去
     url = url.rstrip("/")
-    if url.endswith(".git"):
-        url = url[:-4]
+    url = url.removesuffix(".git")
 
     # Bitbucket Server (projects/KEY/repos/NAME)
     match = re.search(r"/projects/([^/]+)/repos/([^/]+)", url)
