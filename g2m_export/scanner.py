@@ -1,6 +1,6 @@
 import fnmatch
+from collections.abc import Iterator
 from pathlib import Path
-from typing import List, Iterator
 
 
 def is_binary(file_path: Path) -> bool:
@@ -21,7 +21,7 @@ def is_binary(file_path: Path) -> bool:
         return True
 
 
-def should_ignore(path: Path, root: Path, ignore_patterns: List[str]) -> bool:
+def should_ignore(path: Path, root: Path, ignore_patterns: list[str]) -> bool:
     """設定された除外パターンに基づき、対象パスを処理から外すべきか判定する。"""
     rel_path_obj = path.relative_to(root)
     rel_path = str(rel_path_obj)
@@ -44,7 +44,7 @@ def should_ignore(path: Path, root: Path, ignore_patterns: List[str]) -> bool:
 
 
 def scan_files(
-    root_dir: Path, ignore_patterns: List[str], binary_extensions: List[str] = None
+    root_dir: Path, ignore_patterns: list[str], binary_extensions: list[str] = None
 ) -> Iterator[Path]:
     """指定されたディレクトリを再帰的に走査し、有効なテキストファイルのみを列挙する。"""
     if binary_extensions is None:
