@@ -1,20 +1,22 @@
 import argparse
 import sys
-import yaml
 from datetime import datetime
 from pathlib import Path
+
+import yaml
+
 from .git_utils import (
+    get_current_branch,
     get_git_root,
     get_remote_url,
-    get_current_branch,
     parse_repo_info,
 )
-from .scanner import scan_files
 from .markdown_writer import (
-    generate_header,
     generate_file_section,
+    generate_header,
     write_to_file,
 )
+from .scanner import scan_files
 
 
 def load_config(config_path: Path) -> dict:
