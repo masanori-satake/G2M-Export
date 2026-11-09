@@ -1,8 +1,9 @@
+import shutil
+import tempfile
 import unittest
 from pathlib import Path
-import tempfile
-import shutil
-from g2m_export.scanner import should_ignore, is_binary
+
+from g2m_export.scanner import is_binary, should_ignore
 
 
 class TestScanner(unittest.TestCase):

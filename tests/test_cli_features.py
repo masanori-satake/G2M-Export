@@ -1,10 +1,12 @@
-import pytest
 import shutil
+import sys
 import tempfile
 from pathlib import Path
-from g2m_export.cli import main
-import sys
 from unittest.mock import patch
+
+import pytest
+
+from g2m_export.cli import main
 
 
 @pytest.fixture
